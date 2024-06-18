@@ -22,6 +22,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddControllersWithViews(); // or builder.Services.AddMvc(); depending on your setup
 
+builder.Services.AddScoped<SpaceQuery>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

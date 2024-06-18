@@ -15,7 +15,7 @@ namespace Commonspace.Models
         [Required]
         public required string Description { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         [Required]
         public int Capacity { get; set; }
