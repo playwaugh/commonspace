@@ -1,0 +1,21 @@
+@model IEnumerable<Commonspace.Models.Space>
+
+<h1>Spaces</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var space in Model)
+    {
+        <tr>
+            <td>@space.Name</td>
+            <td>@space.Description</td>
+        </tr>
+    }
+    </tbody>
+</table>
