@@ -38,7 +38,7 @@ namespace Commonspace.Controllers
                 return NotFound();
             }
 
-            return Ok (space);
+            return Ok(space);
         }
 
         [HttpPost]

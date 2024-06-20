@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Commonspace.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Commonspace.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<Commonspace.Models.User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

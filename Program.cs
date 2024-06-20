@@ -3,24 +3,34 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Commonspace.Data;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string MyAllowSpecificOrigins = "AllowReactApp";
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:3000") // URL of your React app
-                   .AllowAnyHeader()
-                   .AllowAnyMethod();
-        });
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy  =>
+                      {
+                          policy.WithOrigins("http://localhost:5173")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllersWithViews(); // or builder.Services.AddMvc(); depending on your setup
+builder.Services.AddIdentityCore<Commonspace.Models.User>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddScoped<UserManager<Commonspace.Models.User>>();
+builder.Services.AddScoped<SignInManager<Commonspace.Models.User>>();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<SpaceQuery>();
 
@@ -41,11 +51,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors("AllowReactApp");
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapDefaultControllerRoute(); // or app.MapRazorPages(); depending on your setup
+app.MapDefaultControllerRoute();
 
 app.Run();
