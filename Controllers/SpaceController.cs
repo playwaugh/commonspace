@@ -28,6 +28,19 @@ namespace Commonspace.Controllers
             return Ok(spaces);
         }
 
+        [HttpGet("{id}")]
+        public async Task <IActionResult> GetSpace(int id)
+        {
+            var space = await _context.Spaces.FindAsync(id);
+
+            if (space == null)
+            {
+                return NotFound();
+            }
+
+            return Ok (space);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateSpace(Space space)
         {
