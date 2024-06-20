@@ -92,6 +92,25 @@ namespace commonspace.Migrations
 
                     b.Navigation("User");
                 });
+
+            modelBuilder.Entity("Commonspace.Models.User", b =>
+                {
+                    b.HasMany("Commonspace.Models.Space", "Spaces")
+                        .WithOne("User")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+             modelBuilder.Entity("Commonspace.Models.Booking", b =>
+                {
+                    b.HasOne("Commonspace.Models.User", "User")
+                        .WithMany("Bookings")
+                        .HasForeignKey("UserId");
+
+                    b.HasOne("Commonspace.Models.Space", "Space")
+                        .WithMany("Bookings")
+                        .HasForeignKey("SpaceId");
+                });
 #pragma warning restore 612, 618
         }
     }

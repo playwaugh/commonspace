@@ -28,5 +28,7 @@ namespace Commonspace.Models
 
         [Required]
         public required User User { get; set; }
+
+        public ICollection<Booking>? Bookings { get; set; }
     }
 }
