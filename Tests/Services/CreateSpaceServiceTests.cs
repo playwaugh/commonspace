@@ -38,5 +38,22 @@ namespace Commonspace.Tests.Services
 
             Assert.Equal(space, result);
         }
+
+        [Fact]
+        public async Task CreateSpace_SavesSpaceToDatabase()
+        {
+            var space = new Space
+            {
+                Name = "Test Space",
+                Description = "This is a test space",
+                Address = "Test Location",
+                Capacity = 10,
+                User = new User { UserName = "TestUser", Email = "testuser@gmail.com" }
+            };
+
+            await _service.CreateSpace(space);
+
+            Assert.Contains(_context.Spaces, s => s.Name == "Test Space");
+        }
     }
 }
