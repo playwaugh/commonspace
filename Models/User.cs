@@ -1,15 +1,8 @@
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Commonspace.Models
 {
-    public class User
+    public class User : IdentityUser<int>
     {
-        public int UserId { get; set; }
-
-        [Required]
-        public required string UserName { get; set; }
-
-        [Required]
-        public required string Email { get; set; }
     }
 }

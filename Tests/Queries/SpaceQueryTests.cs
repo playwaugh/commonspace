@@ -5,7 +5,7 @@ using Commonspace.Models;
 using Commonspace.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Commonspace.Tests
+namespace Commonspace.Tests.Queries
 {
     public class SpaceQueryTests
     {
