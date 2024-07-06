@@ -1,5 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Commonspace.Models;
 using System.ComponentModel.DataAnnotations;
@@ -12,11 +18,13 @@ namespace Commonspace.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IConfiguration _configuration;
 
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _configuration = configuration!;
         }
 
         [HttpPost("signup")]
@@ -28,7 +36,8 @@ namespace Commonspace.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return Ok();
+                var token = GenerateJwtToken(user);
+                return Ok(new { Token = token});
             }
 
             return BadRequest(result.Errors);
@@ -41,10 +50,47 @@ namespace Commonspace.Controllers
 
             if (result.Succeeded)
             {
-                return Ok();
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                  return Unauthorized("User not found");
+                }
+                var token = GenerateJwtToken(user);
+                return Ok(new {Token = token});
             }
 
             return Unauthorized();
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+          if (user.Email == null)
+          {
+              throw new ArgumentException("User email cannot be null", nameof(user.Email));
+          }
+
+          string jwtKey = _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key cannot be null");
+          string issuer = _configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer cannot be null");
+          string audience = _configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience cannot be null");
+
+          var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+          var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+          var claims = new[]
+          {
+              new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+              new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+          };
+
+          var token = new JwtSecurityToken(
+              issuer: issuer,
+              audience: audience,
+              claims: claims,
+              expires: DateTime.Now.AddHours(3),
+              signingCredentials: credentials
+          );
+
+          return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 
